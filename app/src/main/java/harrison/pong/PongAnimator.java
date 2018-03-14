@@ -2,6 +2,7 @@ package harrison.pong;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.MotionEvent;
 
 /**
@@ -56,7 +57,6 @@ public class PongAnimator implements Animator {
         ball.onDraw(c);
     }
 
-
     @Override
     public int interval() {
         return tickInterval; //how many millis between ticks
@@ -64,7 +64,7 @@ public class PongAnimator implements Animator {
 
     @Override
     public int backgroundColor() {
-        return 0;
+        return 0xff000000;
     }
 
     @Override
@@ -80,13 +80,27 @@ public class PongAnimator implements Animator {
     @Override
     public void tick(Canvas canvas) {
         ball.move(tickInterval);
+
+        //ball's location
+        int ballX = (int) ball.getX();
+        int ballY = (int) ball.getY();
+
+        //checks if ball hits any wall
+        for (int i=0; i<walls.length; i++) {
+            if (walls[i].touches(ballX, ballY)) {
+                ball.reverseDirection();
+                Log.i ("tick","touched");
+            }
+        }
+
         onDraw(canvas);
+
     }
 
     @Override
     public void onTouch(MotionEvent event) {
         paddle.setX((int)event.getX());
-        paddle.setY((int)event.getY());
+
 
     }
 }

@@ -250,7 +250,6 @@ public class AnimationSurface extends SurfaceView implements OnTouchListener {
 
 				// Note when this tick ended
 				lastTickEnded = System.currentTimeMillis();
-				Log.i("poop","shit");
 			}// while
 		}// run
 	}

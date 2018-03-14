@@ -2,6 +2,7 @@ package harrison.pong;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 /**
  * Created by Harrison on 3/13/2018.
@@ -81,5 +82,21 @@ public class Ball {
 
         x += deltaX;
         y += deltaY;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    /**
+     * reverses ball's direction
+     */
+    public void reverseDirection() {
+        this.direction += Math.PI;
+        Log.i ("Ball","reversed");
     }
 }

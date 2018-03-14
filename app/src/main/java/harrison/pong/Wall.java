@@ -48,9 +48,9 @@ public class Wall {
      */
     public boolean touches (int x, int y) {
         if (x < left) return false;
-        if (y > top) return false;
+        if (y < top) return false;
         if (x > right) return false;
-        if (y < bottom) return false;
+        if (y > bottom) return false;
 
         return true;
     }
