@@ -5,6 +5,7 @@ import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.LinearLayout;
 
@@ -32,6 +33,7 @@ public class PongMainActivity extends AppCompatActivity {
         // Connect the animation surface with the animator
         AnimationSurface mySurface = (AnimationSurface) this
                 .findViewById(R.id.animationSurface);
+        Log.i("onCreate",""+mySurface.getWidth());
         mySurface.setAnimator(new PongAnimator());
     }
 }

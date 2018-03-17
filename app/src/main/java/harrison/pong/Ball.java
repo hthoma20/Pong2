@@ -59,8 +59,8 @@ public class Ball {
         this.paint.setColor(col);
 
         //set random speed
-        int minSpeed = 50;
-        int maxSpeed = 300;
+        int minSpeed = 1000;
+        int maxSpeed = 3000;
         this.speed = (int) (Math.random()*(maxSpeed-minSpeed)+minSpeed);
 
         //set random direction
@@ -73,7 +73,11 @@ public class Ball {
      * @param c canvas on which to draw
      */
     public void onDraw (Canvas c){
+
         c.drawCircle((float)x,(float)y,radius,paint);
+        Paint dotPaint= new Paint();
+        dotPaint.setColor(0xff000000);
+        c.drawCircle((float)x,(float)y,3,dotPaint);
     }
 
     /**
@@ -109,9 +113,14 @@ public class Ball {
     public double getDirection () {
         return direction;
     }
+
     public void setDirection (double direction) {
         this.direction = direction;
         angleDirection();
+    }
+
+    public void setSpeed (int speed) {
+        this.speed = speed;
     }
 
     /**

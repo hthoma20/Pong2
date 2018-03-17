@@ -22,13 +22,13 @@ public class Paddle extends Wall {
     public Paddle(int left, int top, int right, int bottom, int color) {
         super(left, top, right, bottom, color);
         width = right-left;
-        height = top-bottom;
+        height = bottom-top;
     }
 
     /**
      * sets x-coord of center of paddle
      */
-    public void setX (int x) {
+    public void setCenterX (int x) {
         left = x-(width/2);
         right = x+(width/2);
     }
@@ -36,10 +36,21 @@ public class Paddle extends Wall {
     /**
      * sets y-coord of center of paddle
      */
-    public void setY (int y) {
-        top = y-(height/2);
-        bottom = y+(height/2);
+    public void setCenterY (int y) {
+        top = y+(height/2);
+        bottom = y-(height/2);
     }
 
+    public int getCenterX () {
+        return (left+right)/2;
+    }
+
+    public int getCenterY () {
+        return (top+bottom)/2;
+    }
+
+    public int getHeight(){
+        return height;
+    }
 
 }
