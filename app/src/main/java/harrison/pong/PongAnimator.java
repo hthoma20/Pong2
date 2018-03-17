@@ -1,23 +1,21 @@
 package harrison.pong;
 
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.util.Log;
 import android.view.MotionEvent;
 
 /**
  * Created by Harrison on 3/13/2018.
  */
 
-public class PongAnimator implements Animator {
+public class PongAnimator implements Animator{
 
     //array of walls: left, top, right
-    private Wall[] walls = new Wall[3];
+    private Wall[] walls = new Wall[4];
     private static final int LEFT = 0;
     private static final int TOP = 1;
     private static final int RIGHT = 2;
+    private static final int PADDLE = 3;
 
-    private Paddle paddle;
     private Ball ball;
 
     private int tickInterval = 7;
@@ -41,10 +39,10 @@ public class PongAnimator implements Animator {
                 new Wall(screenWidth-wallWidth,wallWidth,
                         screenWidth,screenHeight,wallColor);
 
-        paddle = new Paddle (screenWidth/2, screenHeight-wallWidth,
+        walls[PADDLE] = new Paddle (screenWidth/2, screenHeight-wallWidth,
                         screenWidth/2+300,screenHeight, 0xffff0000);
 
-        ball = new Ball (screenWidth/2,screenHeight/2,45,1000,0,0xff0000ff);
+        ball = new Ball (screenWidth/4,screenHeight/4,45,1000,Math.PI/3,0xff0000ff);
     }
 
     public void onDraw (Canvas c){
@@ -53,7 +51,6 @@ public class PongAnimator implements Animator {
             walls[i].onDraw(c);
         }
 
-        paddle.onDraw(c);
         ball.onDraw(c);
     }
 
@@ -84,12 +81,47 @@ public class PongAnimator implements Animator {
         //ball's location
         int ballX = (int) ball.getX();
         int ballY = (int) ball.getY();
+        int ballRad = (int) ball.getRadius();
+        double ballDir = ball.getDirection (); //direction as an angle
+        int quadDir = ball.quadrantDirection(); //direction as cardinal direction
 
+        int i;
         //checks if ball hits any wall
-        for (int i=0; i<walls.length; i++) {
-            if (walls[i].touches(ballX, ballY)) {
-                ball.reverseDirection();
-                Log.i ("tick","touched");
+        for (i=0; i<walls.length; i++) {
+            if (walls[i].isPointWithin(ballX, ballY, ballRad)) {
+                ball.incrementDirection(Math.PI/2);
+                break;
+            }
+        }
+
+        if(i < walls.length) {
+            //check which side of wall ball hits
+            //and determine which angle ball will bounce off at
+            switch (walls[i].sideClosestTo(ballX, ballY)) {
+                case Wall.LEFTSIDE:
+                    //if ball is traveling east
+                    if (quadDir == ball.NE || quadDir == ball.SE) {
+                        ball.setDirection(Math.PI - ballDir);
+                    }
+                    break;
+                case Wall.TOPSIDE:
+                    //if ball is traveling south
+                    if (quadDir == ball.SE || quadDir == ball.SW) {
+                        ball.setDirection(-ballDir);
+                    }
+                    break;
+                case Wall.RIGHTSIDE:
+                    //if ball is traveling west
+                    if (quadDir == ball.NW || quadDir == ball.SW) {
+                        ball.setDirection(Math.PI-ballDir);
+                    }
+                    break;
+                case Wall.BOTTOMSIDE:
+                    //if ball is traveling north
+                    if (quadDir == ball.NE || quadDir == ball.NW) {
+                        ball.setDirection(-ballDir);
+                    }
+                    break;
             }
         }
 
@@ -99,8 +131,6 @@ public class PongAnimator implements Animator {
 
     @Override
     public void onTouch(MotionEvent event) {
-        paddle.setX((int)event.getX());
-
-
+        ((Paddle)walls[PADDLE]).setX((int)event.getX());
     }
 }

@@ -16,6 +16,12 @@ public class Wall {
     protected int bottom;
     private Paint paint = new Paint () ;
 
+    //the sides of any wall used for touching
+    public static final int LEFTSIDE = 1;
+    public static final int TOPSIDE = 2;
+    public static final int RIGHTSIDE = 3;
+    public static final int BOTTOMSIDE = 4;
+
     /**
      * wall constructor
      *
@@ -44,15 +50,55 @@ public class Wall {
     /**
      * @param x coord of point to test
      * @param y coord of point to test
-     * @return whether the point is within/on the wall
+     * @param rad the distance from the wall to test
+     * @return the side of wall ball hit
      */
-    public boolean touches (int x, int y) {
-        if (x < left) return false;
-        if (y < top) return false;
-        if (x > right) return false;
-        if (y > bottom) return false;
+    public boolean isPointWithin (int x, int y, int rad) {
+        if (x < left-rad) return false;
+        if (y < top-rad) return false;
+        if (x > right+rad) return false;
+        if (y > bottom+rad) return false;
 
         return true;
+    }
+
+    /**
+     * checks which wall side ball is closest to
+     *
+     * @param x coord of point
+     * @param y coord of point
+     * @return the side the point is closest to
+     */
+    public int sideClosestTo (int x, int y) {
+        int distL = Math.abs(left-x);
+        int distT = Math.abs(top-y);
+        int distR = Math.abs(right-x);
+        int distB = Math.abs(bottom-y);
+
+        //determines min value
+        int min = minVal(distL,distT,distR,distB);
+
+        if (min==distL) return LEFTSIDE;
+        if (min==distT) return TOPSIDE;
+        if (min==distR) return RIGHTSIDE;
+        return BOTTOMSIDE;
+    }
+
+    /**
+     * finds min value
+     * @param vals values to find min out of
+     * @return min value
+     */
+    public int minVal (int... vals) {
+        if (vals == null || vals.length<1) return 0;
+
+        int min = vals[0];
+
+        for (int i=0; i<vals.length; i++) {
+            if (vals[i]<min) min = vals[i];
+        }
+
+        return min;
     }
 
 }

@@ -15,8 +15,14 @@ public class Ball {
     private double y;
     private int radius;
     private int speed; //in pixels/sec
-    public double direction; //in radians
+    private double direction; //in radians
     private Paint paint = new Paint();
+
+    //the 4 quadrants of direction that ball could be traveling
+    public static final int NE = 1;
+    public static final int NW = 2;
+    public static final int SW = 3;
+    public static final int SE = 4;
 
     /**
      * Ball constructor
@@ -34,6 +40,7 @@ public class Ball {
         this.radius = rad;
         this.speed = spd;
         this.direction = dir;
+        angleDirection();
         this.paint.setColor(col);
     }
 
@@ -58,6 +65,7 @@ public class Ball {
 
         //set random direction
         this.direction = Math.random()*2*Math.PI;
+        angleDirection();
     }
 
     /**
@@ -74,6 +82,8 @@ public class Ball {
      * @param deltaT the amount of time since last move in milliseconds
      */
     public void move (int deltaT){
+        //TODO ball speed seems to be dependent on given deltaT
+
         double xSpeed = Math.cos(direction)*speed;
         double ySpeed = Math.sin(direction)*speed;
 
@@ -81,7 +91,7 @@ public class Ball {
         double deltaY = ySpeed*deltaT/1000;
 
         x += deltaX;
-        y += deltaY;
+        y -= deltaY; //minus is since Java's y-axis increases downward
     }
 
     public double getX() {
@@ -92,11 +102,49 @@ public class Ball {
         return y;
     }
 
+    public int getRadius(){
+        return radius;
+    }
+
+    public double getDirection () {
+        return direction;
+    }
+    public void setDirection (double direction) {
+        this.direction = direction;
+        angleDirection();
+    }
+
     /**
-     * reverses ball's direction
+     * increments ball's direction
+     *
+     * @param deltaTheta the angle by which to increment
      */
-    public void reverseDirection() {
-        this.direction += Math.PI;
-        Log.i ("Ball","reversed");
+    public void incrementDirection(double deltaTheta) {
+        this.direction += deltaTheta;
+        angleDirection();
+    }
+
+    /**
+     * makes sure direction is between angles 0 and 2pi
+     * If not between range, changes to corresponding angle within range
+     */
+    private void angleDirection () {
+        while (direction<0) {
+            direction += Math.PI*2;
+        }
+        while (direction>=2*Math.PI) {
+            direction -= Math.PI*2;
+        }
+    }
+
+    /**
+     * determines which direction ball is traveling in
+     * @return the direction ball is traveling
+     */
+    public int quadrantDirection () {
+        if (direction >= 3*Math.PI/2) return SE;
+        if (direction >= Math.PI) return SW;
+        if (direction >= Math.PI/2) return NW;
+        return NE;
     }
 }
