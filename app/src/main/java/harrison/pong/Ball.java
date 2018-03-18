@@ -114,13 +114,17 @@ public class Ball {
         return direction;
     }
 
-    public void setDirection (double direction) {
-        this.direction = direction;
-        angleDirection();
+    public void setX (double x) {
+        this.x = x;
     }
 
     public void setSpeed (int speed) {
         this.speed = speed;
+    }
+
+    public void setDirection (double direction) {
+        this.direction = direction;
+        angleDirection();
     }
 
     /**

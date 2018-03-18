@@ -41,6 +41,26 @@ public class Paddle extends Wall {
         bottom = y-(height/2);
     }
 
+    /**
+     * changes location of paddle based on a given left side
+     * while maintaining size of paddle
+     * @param newLeft where the left side of paddle should start
+     */
+    public void setLeft (int newLeft){
+        this.left = newLeft;
+        this.right = left+width;
+    }
+
+    /**
+     * changes location of paddle based on given right side
+     * while maintaining size of paddle
+     * @param newRight where the right side of paddle should start
+     */
+    public void setRight (int newRight) {
+        this.right = newRight;
+        this.left = right-width;
+    }
+
     public int getCenterX () {
         return (left+right)/2;
     }

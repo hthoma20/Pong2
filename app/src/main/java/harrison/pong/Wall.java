@@ -94,8 +94,8 @@ public class Wall {
 
         int min = vals[0];
 
-        for (int i=0; i<vals.length; i++) {
-            if (vals[i]<min) min = vals[i];
+        for (int val : vals) {
+            if (val<min) min = val;
         }
 
         return min;

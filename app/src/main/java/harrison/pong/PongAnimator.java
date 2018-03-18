@@ -66,12 +66,11 @@ public class PongAnimator implements Animator{
 
     public void onDraw (Canvas c){
         //draw walls
-        for (int i=0; i<walls.length; i++) {
-            walls[i].onDraw(c);
+        for (Wall wall : walls) {
+            wall.onDraw(c);
         }
 
         drawScore(c);
-
         ball.onDraw(c);
     }
 
@@ -88,8 +87,8 @@ public class PongAnimator implements Animator{
          * External citation
          * Date: 3/16/18
          * Problem: Wanted to draw the score on the surface
-         * Resource: Android Canvas API
-         * Solution: drawText()
+         * Resource: Android Canvas API, Android Paint API
+         * Solution: drawText(), setTextAlign()
          */
     }
 
@@ -149,12 +148,12 @@ public class PongAnimator implements Animator{
 
         //the wall we are checking for a collision with
         //checks if ball hits any wall
-        for (int currWall=0; currWall<walls.length; currWall++) {
+        for (Wall currWall : walls) {
             //if the ball is within the radius of the current wall
-            if (walls[currWall].isPointWithin(ballX, ballY, ballRad)) {
+            if (currWall.isPointWithin(ballX, ballY, ballRad)) {
                 //we have found the wall the ball is touching
                 //so return which side of the wall the ball hit
-                return walls[currWall];
+                return currWall;
             }
         }
 
@@ -214,7 +213,7 @@ public class PongAnimator implements Animator{
      * if so, places ball back in play
      * @return whether ball was out of bounds
      */
-    public boolean restartBall () {
+    private boolean restartBall () {
         int ballRad = ball.getRadius();
 
         //ball still in valid area
@@ -231,25 +230,55 @@ public class PongAnimator implements Animator{
 
     @Override
     public void onTouch(MotionEvent event) {
-        if (!ballInPlay && event.getAction() == MotionEvent.ACTION_DOWN) {
-            ballInPlay = true;
-
-            //set random speed
-            int minSpeed = 1000;
-            int maxSpeed = 3000;
-            int spd = (int) (Math.random()*(maxSpeed-minSpeed)+minSpeed);
-            ball.setSpeed(spd);
-
-            //set random direction
-            double minDir = Math.PI/6;
-            double maxDir = 5*Math.PI/6;
-            double dir = Math.random()*(maxDir-minDir)+minDir;
-            ball.setDirection(dir);
+        if (!ballInPlay) {
+            //if screen was tapped
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                //todo add start button
+                startBall();
+            }
+            else { //makes dead ball follow paddle's location
+                ball.setX(event.getX());
+            }
         }
+        movePaddle((int) event.getX());
+    }
 
-        //TODO dead ball must move with paddle
+    /**
+     * sets random speed and direction of starting ball
+     */
+    public void startBall () {
+        ballInPlay = true;
 
-        //TODO never let paddle go thru wall
-        paddle.setCenterX((int)event.getX());
+        //set random speed
+        int minSpeed = 1000;
+        int maxSpeed = 3000;
+        int spd = (int) (Math.random()*(maxSpeed-minSpeed)+minSpeed);
+        ball.setSpeed(spd);
+
+        //set random direction
+        double minDir = Math.PI/6;
+        double maxDir = 5*Math.PI/6;
+        double dir = Math.random()*(maxDir-minDir)+minDir;
+        ball.setDirection(dir);
+    }
+
+    /**
+     * moves paddle according to right and left boundaries
+     * @param x coord of where we want to move paddle
+     */
+    public void movePaddle (int x) {
+        paddle.setCenterX(x);
+
+        //these are boundaries that paddle is allowed to be within
+        int leftBoundary = walls[LEFT].getRight();
+        int rightBoundary = walls[RIGHT].getLeft();
+        //make sure paddle is in bounds
+
+        if (paddle.getLeft() < leftBoundary) {
+            paddle.setLeft(leftBoundary);
+        }
+        else if (paddle.getRight() > rightBoundary) {
+            paddle.setRight(rightBoundary);
+        }
     }
 }
