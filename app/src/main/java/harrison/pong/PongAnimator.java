@@ -237,7 +237,7 @@ public class PongAnimator implements Animator{
                 startBall();
             }
             else { //makes dead ball follow paddle's location
-                ball.setX(event.getX());
+                ball.setX(paddle.getCenterX());
             }
         }
         movePaddle((int) event.getX());
