@@ -36,7 +36,7 @@ public class PongAnimator implements Animator{
      */
     public PongAnimator (){
         screenWidth = 2550;
-        screenHeight = 1500;
+        screenHeight = 1300;
         int wallWidth = 65;
 
         int wallColor = 0xff555555;
@@ -70,8 +70,21 @@ public class PongAnimator implements Animator{
             wall.onDraw(c);
         }
 
+        drawBoundary(c);
         drawScore(c);
         ball.onDraw(c);
+    }
+
+    private void drawBoundary (Canvas c) {
+        Paint boundaryPaint = new Paint ();
+        boundaryPaint.setColor(0xffffffff);
+
+        //the length of each segment of broken line
+        int interval = 25;
+
+        for(int i=0; i <= screenWidth; i+= 2*interval){
+            c.drawLine(i,screenHeight,i+interval,screenHeight,boundaryPaint);
+        }
     }
 
     private void drawScore(Canvas c){
@@ -227,18 +240,27 @@ public class PongAnimator implements Animator{
         return true;
     }
 
+    /**
+     * if ball is dead, starts game
+     *
+     * @param minSpeed that player wants
+     * @param maxSpeed that player wants
+     *
+     * @return whether the game was started
+     */
+    public boolean startGame (int minSpeed, int maxSpeed) {
+        //if ball is in play, we don't want to start game
+        if (ballInPlay) return false;
+
+        startBall(minSpeed, maxSpeed);
+
+        return true;
+}
 
     @Override
     public void onTouch(MotionEvent event) {
         if (!ballInPlay) {
-            //if screen was tapped
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                //todo add start button
-                startBall();
-            }
-            else { //makes dead ball follow paddle's location
-                ball.setX(paddle.getCenterX());
-            }
+             ball.setX(paddle.getCenterX());
         }
         movePaddle((int) event.getX());
     }
@@ -246,12 +268,10 @@ public class PongAnimator implements Animator{
     /**
      * sets random speed and direction of starting ball
      */
-    public void startBall () {
+    public void startBall (int minSpeed, int maxSpeed) {
         ballInPlay = true;
 
         //set random speed
-        int minSpeed = 1000;
-        int maxSpeed = 3000;
         int spd = (int) (Math.random()*(maxSpeed-minSpeed)+minSpeed);
         ball.setSpeed(spd);
 
@@ -280,5 +300,21 @@ public class PongAnimator implements Animator{
         else if (paddle.getRight() > rightBoundary) {
             paddle.setRight(rightBoundary);
         }
+    }
+
+    /**
+     * if ball is out of play, the paddle size will change
+     *
+     * @param paddleSize the new size of paddle
+     * @return whether the size was changed
+     */
+    public boolean changePaddleSize(int paddleSize){
+        if(ballInPlay) return false;
+
+        //TODO currently user is able to change size past wall
+        //TODO paddle size is not updated when ball goes out of play
+
+        paddle.setWidth(paddleSize);
+        return true;
     }
 }

@@ -26,6 +26,21 @@ public class Paddle extends Wall {
     }
 
     /**
+     * sets width of paddle according to seekBar
+     * changes left and right to match
+     * @param width
+     */
+    public void setWidth (int width) {
+        int center = getCenterX();
+        left = center-width/2;
+
+        //the %2 corrects for an odd width
+        right = center+width/2 +width%2;
+
+        this.width= width;
+    }
+
+    /**
      * sets x-coord of center of paddle
      */
     public void setCenterX (int x) {

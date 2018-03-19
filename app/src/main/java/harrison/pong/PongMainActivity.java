@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
+import android.widget.SeekBar;
 
 /**
  * PongMainActivity
@@ -22,6 +25,8 @@ import android.widget.LinearLayout;
  */
 public class PongMainActivity extends AppCompatActivity {
 
+
+
     /**
      * creates an AnimationSurface containing a TestAnimator.
      */
@@ -33,7 +38,13 @@ public class PongMainActivity extends AppCompatActivity {
         // Connect the animation surface with the animator
         AnimationSurface mySurface = (AnimationSurface) this
                 .findViewById(R.id.animationSurface);
-        Log.i("onCreate",""+mySurface.getWidth());
-        mySurface.setAnimator(new PongAnimator());
+        PongAnimator pong = new PongAnimator();
+        mySurface.setAnimator(pong);
+
+        Button startButton= (Button)findViewById(R.id.buttonStart);
+        SeekBar paddleSizeBar= (SeekBar)findViewById(R.id.seekBarPaddleSize);
+        RadioGroup ballSpeedRadio= (RadioGroup)findViewById(R.id.radioGroupSpeed);
+
+        Controls control = new Controls(pong,startButton,paddleSizeBar,ballSpeedRadio);
     }
 }
