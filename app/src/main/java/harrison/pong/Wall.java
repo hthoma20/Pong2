@@ -4,7 +4,10 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 
 /**
- * Created by Harrison on 3/13/2018.
+ * Class Wall
+ *
+ * @author Harry Thoma
+ * @author Daylin Kuboyama
  */
 
 public class Wall {

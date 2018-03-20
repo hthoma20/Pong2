@@ -31,6 +31,9 @@ public class PongAnimator implements Animator{
 
     private int tickInterval = 7;
 
+    //reference to Controls object that owns this PongAnimator
+    private Controls control = null;
+
     /**
      * PongAnimator constructor
      */
@@ -105,6 +108,18 @@ public class PongAnimator implements Animator{
          */
     }
 
+    /**
+     * if we don't already have a control, sets control to given control
+     * @param control the control to set
+     * @return whether we set the control
+     */
+    public boolean setControls (Controls control) {
+        if (this.control != null) return false;
+
+        this.control = control;
+        return true;
+    }
+
     @Override
     public int interval() {
         return tickInterval; //how many millis between ticks
@@ -140,7 +155,7 @@ public class PongAnimator implements Animator{
             if (hitWall == paddle) score++;
 
             //if ball was out of bounds, restart ball in playing position
-            restartBall();
+            if (!ballInBounds()) restartBall();
         }
 
         onDraw(canvas);
@@ -172,6 +187,13 @@ public class PongAnimator implements Animator{
 
         //no wall was hit
         return null;
+    }
+
+    /**
+     * @return whether ball is in valid area
+     */
+    private boolean ballInBounds () {
+        return (ball.getY() < screenHeight+ball.getRadius());
     }
 
     /**
@@ -220,49 +242,38 @@ public class PongAnimator implements Animator{
         }
     }
 
-
     /**
-     * checks if ball is out of bounds
-     * if so, places ball back in play
-     * @return whether ball was out of bounds
+     * places ball back in starting position
      */
-    private boolean restartBall () {
+    private void restartBall () {
         int ballRad = ball.getRadius();
-
-        //ball still in valid area
-        if(ball.getY() < screenHeight+ballRad) return false;
 
         ball = new Ball (paddle.getCenterX(),paddle.getTop()-ballRad,
                 ballRad,0,0,0xff0000ff);
+
         ballInPlay = false;
         score= 0;
 
-        return true;
+        control.ballRestarted();
     }
 
     /**
      * if ball is dead, starts game
+     * if ball is live, restarts game
      *
      * @param minSpeed that player wants
      * @param maxSpeed that player wants
      *
-     * @return whether the game was started
+     * @return whether the game was started (T) or restarted (F)
      */
     public boolean startGame (int minSpeed, int maxSpeed) {
-        //if ball is in play, we don't want to start game
-        if (ballInPlay) return false;
+        if (ballInPlay) {
+            restartBall();
+            return false;
+        }
 
         startBall(minSpeed, maxSpeed);
-
         return true;
-}
-
-    @Override
-    public void onTouch(MotionEvent event) {
-        if (!ballInPlay) {
-             ball.setX(paddle.getCenterX());
-        }
-        movePaddle((int) event.getX());
     }
 
     /**
@@ -282,13 +293,30 @@ public class PongAnimator implements Animator{
         ball.setDirection(dir);
     }
 
+    @Override
+    public void onTouch(MotionEvent event) {
+        if (!ballInPlay) {
+            ball.setX(paddle.getCenterX());
+        }
+        movePaddle((int) event.getX());
+    }
+
     /**
      * moves paddle according to right and left boundaries
      * @param x coord of where we want to move paddle
      */
     public void movePaddle (int x) {
         paddle.setCenterX(x);
+        checkPaddleToWall();
 
+    }
+
+    /**
+     * checks if paddle is touching or past any wall
+     * if so, moves paddle within wall boundaries
+     * @return whether paddle had to move
+     */
+    private boolean checkPaddleToWall () {
         //these are boundaries that paddle is allowed to be within
         int leftBoundary = walls[LEFT].getRight();
         int rightBoundary = walls[RIGHT].getLeft();
@@ -296,10 +324,14 @@ public class PongAnimator implements Animator{
 
         if (paddle.getLeft() < leftBoundary) {
             paddle.setLeft(leftBoundary);
+            return true;
         }
-        else if (paddle.getRight() > rightBoundary) {
+        if (paddle.getRight() > rightBoundary) {
             paddle.setRight(rightBoundary);
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -311,10 +343,12 @@ public class PongAnimator implements Animator{
     public boolean changePaddleSize(int paddleSize){
         if(ballInPlay) return false;
 
-        //TODO currently user is able to change size past wall
-        //TODO paddle size is not updated when ball goes out of play
-
         paddle.setWidth(paddleSize);
+        //makes sure paddle does not pass wall boundary
+        if (checkPaddleToWall()) {
+            //if paddle moved, ball should follow
+            ball.setX(paddle.getCenterX());
+        }
         return true;
     }
 }

@@ -7,17 +7,24 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 
 /**
- * Created by Harrison on 3/19/2018.
+ * Class Controls
+ *
+ * has references to and listens to the views on the
+ * control panel
+ *
+ * @author Harry Thoma
+ * @author Daylin Kuboyama
  */
 
 public class Controls implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     PongAnimator pong;
     Button startButton;
+    Button addBallButton;
     SeekBar paddleSeekBar;
     RadioGroup speedRadioGroup;
 
-    int minPaddle= 50;
+    int minPaddle= 100;
     int maxPaddle= 700;
 
     /**
@@ -28,31 +35,78 @@ public class Controls implements View.OnClickListener, SeekBar.OnSeekBarChangeLi
      * @param paddleSize
      * @param speedRadioGroup
      */
-    public Controls (PongAnimator pong, Button start, SeekBar paddleSize,
-                     RadioGroup speedRadioGroup) {
+    public Controls (PongAnimator pong, Button start, Button addBall,
+                     SeekBar paddleSize, RadioGroup speedRadioGroup) {
         this.pong = pong;
         this.startButton = start;
+        this.addBallButton = addBall;
         this.paddleSeekBar = paddleSize;
         this.speedRadioGroup = speedRadioGroup;
 
-        startButton.setOnClickListener (this);
-        paddleSeekBar.setOnSeekBarChangeListener(this);
+        pong.setControls(this);
+        initViews();
+        initListener();
+    }
 
+    /**
+     * initializes the views
+     */
+    private void initViews () {
         paddleSeekBar.setMax(maxPaddle-minPaddle);
         setSeekBarToSize((maxPaddle-minPaddle)/2);
+
+        speedRadioGroup.check(R.id.radioButtonNormal); //default to normal
+    }
+
+    /**
+     * initializes the listeners
+     */
+    private void initListener () {
+        startButton.setOnClickListener (this);
+        addBallButton.setOnClickListener(this);
+        paddleSeekBar.setOnSeekBarChangeListener(this);
+
     }
 
     @Override
     public void onClick(View view) {
         if (view == startButton) {
-            pong.startGame(2000,3000);
+            //the radio button selected
+            int checkedID = speedRadioGroup.getCheckedRadioButtonId();
+            int minSpeed = -1;
+            int maxSpeed = -1;
+
+            if (checkedID == R.id.radioButtonSlow) {
+                minSpeed = 2000;
+                maxSpeed = 3000;
+            }
+            else if (checkedID == R.id.radioButtonNormal) {
+                minSpeed = 4000;
+                maxSpeed = 5000;
+            }
+            else if (checkedID == R.id.radioButtonFast) {
+                minSpeed = 6000;
+                maxSpeed = 7000;
+            }
+
+            startButton.setText("STOP!"); //changes text on button
+            pong.startGame(minSpeed, maxSpeed);
         }
+    }
+
+    /**
+     * updates controls to match restarted game
+     */
+    public void ballRestarted () {
+        startButton.setText("START!");
+        pong.changePaddleSize(paddleSize());
+
     }
 
     /**
      * @return the size the paddle should be based on the seekBar
      */
-    private int paddleSize(){
+    public int paddleSize(){
         return paddleSeekBar.getProgress()+minPaddle;
     }
 

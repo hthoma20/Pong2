@@ -25,8 +25,6 @@ import android.widget.SeekBar;
  */
 public class PongMainActivity extends AppCompatActivity {
 
-
-
     /**
      * creates an AnimationSurface containing a TestAnimator.
      */
@@ -42,9 +40,12 @@ public class PongMainActivity extends AppCompatActivity {
         mySurface.setAnimator(pong);
 
         Button startButton= (Button)findViewById(R.id.buttonStart);
+        Button addBallButton = (Button) findViewById(R.id.buttonAddBall);
         SeekBar paddleSizeBar= (SeekBar)findViewById(R.id.seekBarPaddleSize);
         RadioGroup ballSpeedRadio= (RadioGroup)findViewById(R.id.radioGroupSpeed);
 
-        Controls control = new Controls(pong,startButton,paddleSizeBar,ballSpeedRadio);
+        Controls control =
+                new Controls(pong,startButton,addBallButton,
+                            paddleSizeBar,ballSpeedRadio);
     }
 }
