@@ -24,8 +24,14 @@ public class Controls implements View.OnClickListener, SeekBar.OnSeekBarChangeLi
     SeekBar paddleSeekBar;
     RadioGroup speedRadioGroup;
 
+    //range of size of paddle
     int minPaddle= 100;
     int maxPaddle= 700;
+
+    //range of speed of ball
+    //-1 means not set
+    int minSpeed= -1;
+    int maxSpeed= -1;
 
     /**
      * controls constructor
@@ -71,26 +77,41 @@ public class Controls implements View.OnClickListener, SeekBar.OnSeekBarChangeLi
     @Override
     public void onClick(View view) {
         if (view == startButton) {
-            //the radio button selected
-            int checkedID = speedRadioGroup.getCheckedRadioButtonId();
-            int minSpeed = -1;
-            int maxSpeed = -1;
+            //sets min and max
+            minAndMaxFromRadioButton();
 
-            if (checkedID == R.id.radioButtonSlow) {
-                minSpeed = 2000;
-                maxSpeed = 3000;
+            //whether game started or restarted
+            boolean pongRestart = pong.changeBallState(minSpeed, maxSpeed);
+            //if game started
+            if (!pongRestart) {
+                startButton.setText("STOP!"); //changes text on button
             }
-            else if (checkedID == R.id.radioButtonNormal) {
-                minSpeed = 4000;
-                maxSpeed = 5000;
-            }
-            else if (checkedID == R.id.radioButtonFast) {
-                minSpeed = 6000;
-                maxSpeed = 7000;
-            }
+        }
+        else if (view == addBallButton) {
+            minAndMaxFromRadioButton();
+            pong.addBall(minSpeed,maxSpeed);
+        }
+    }
 
-            startButton.setText("STOP!"); //changes text on button
-            pong.startGame(minSpeed, maxSpeed);
+    /**
+     * sets minSpeed and maxSpeed variables to corresponding
+     * speeds according to radio button selected
+     */
+    public void minAndMaxFromRadioButton () {
+        //the radio button selected
+        int checkedID = speedRadioGroup.getCheckedRadioButtonId();
+
+        if (checkedID == R.id.radioButtonSlow) {
+            minSpeed = 2000;
+            maxSpeed = 3000;
+        }
+        else if (checkedID == R.id.radioButtonNormal) {
+            minSpeed = 4000;
+            maxSpeed = 5000;
+        }
+        else if (checkedID == R.id.radioButtonFast) {
+            minSpeed = 6000;
+            maxSpeed = 7000;
         }
     }
 
@@ -100,7 +121,6 @@ public class Controls implements View.OnClickListener, SeekBar.OnSeekBarChangeLi
     public void ballRestarted () {
         startButton.setText("START!");
         pong.changePaddleSize(paddleSize());
-
     }
 
     /**
